@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Calendar Panda</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/calendar.css">
+		<link rel="stylesheet" href="css/normalize.css">
+  	<link rel="stylesheet" href="css/foundation.css">
+
+
+		<script src="js/vendor/modernizr.js"></script>
+
+    <script>
+      calDays = ['Sun','Mon','Tue','Wed','Thu','Fri', 'Sat'];
+      calMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+      currentDate = new Date();
+
+      function Calendar(month,year){
+        this.month = (isNaN(month) || month == null) ? currentDate.getMonth() : month;
+        this.year  = (isNaN(year) || year == null) ? currentDate.getFullYear() : year;
+        this.html = '';
+      }
+
+      Calendar.prototype.generateHTML = function(){
+        // get first day of month
+        var firstDay = new Date(this.year, this.month, 1);
+        var startingDay = firstDay.getDay();
+        
+        // find number of days in month
+        var d = new Date(this.year, this.month + 1, 0);
+        var monthLength = d.getDate();
+        
+        var rows = Math.ceil((monthLength + startingDay) / 7);
+
+        // do the header
+        var monthName = calMonths[this.month];
+        var html = '<table class="calendar-table">';
+        html += '<tr><th colspan="7">';
+        html +=  monthName + "&nbsp;" + this.year;
+        html += '</th></tr>';
+        html += '<tr class="calendar-header">';
+        for(var i = 0; i <= 6; i++ ){
+          html += '<td class="calendar-header-day">';
+          html += calDays[i];
+          html += '</td>';
+        }
+        html += '</tr><tr>';
+
+        // fill in the days
+        var day = 1;
+        // this loop is for is weeks (rows)
+        for (var i = 0; i < rows; i++) {
+          // this loop is for weekdays (cells)
+          for (var j = 0; j <= 6; j++) { 
+            html += '<td class="calendar-day">';
+            if (day <= monthLength && (i > 0 || j >= startingDay)) {
+              html+= '<button>'
+              html += day;
+              html+= '</button>'
+              day++;
+            }
+            html += '</td>';
+          }
+          // stop making rows if we've run out of days
+          if (day > monthLength) {
+            break;
+          } else {
+            html += '</tr><tr>';
+          }
+        }
+        html += '</tr></table>';
+
+        this.html = html;
+      }
+
+      Calendar.prototype.getHTML = function() {
+        return this.html;
+      }
+
+      Calendar.prototype.setMonth = function(month) {
+        this.month = month;
+      }
+
+      Calendar.prototype.setYear = function(year) {
+        this.year = year;
+      }
+
+      Calendar.prototype.getMonth = function() {
+        return this.month;
+      }
+
+      Calendar.prototype.getYear = function() {
+        return this.year;
+      }
+
+    </script>
+	</head>
+
+	<body>
+		<div class="fixed">
+			<nav class="top-bar" data-topbar role="navigation" data-options="sticky_on: large">
+				<ul class="title-area">
+    				<li class="name">
+    					<h1><a href="#">Calendar Panda</a></h1>
+    				</li>
+     				<!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+    				<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+  				</ul>
+  				<section class="top-bar-section">
+  					<ul class="left">
+  						<li><a href="#">Explore</a></li>
+  						<li><a href="#">Request</a></li>
+  						<li><a href="#">Create</a></li>
+  						<li><a href="#">Promote</a></li>
+  					</ul>
+  					<ul class="right">
+  						<li><a href="#">Log-in</a></li>
+  						<li><a href="#">Sign-up</a></li>
+  					</ul>
+  				</section>
+  			</nav>
+		</div>
+
+    <input id="previousMonth" class="btnCalendar" type="button" value="<"/>
+    <div id="calendar"></div>
+    <input id="nextMonth" class="btnCalendar" type="button" value=">"/>
+
+		<script src="js/vendor/jquery.js"></script>
+  		<script src="js/foundation.min.js"></script>
+  		<script>
+    		$(document).foundation();
+        $(document).ready(function(){
+            var cal = new Calendar();
+            cal.generateHTML();
+            $('#calendar').append(cal.getHTML());
+
+            $('#previousMonth').click(function(){
+                $('#calendar').html('');
+
+                if(cal.getMonth()-1>=0){
+                  cal.setMonth(cal.getMonth()-1);
+                }
+                else{
+                  cal.setYear(cal.getYear()-1);
+                  cal.setMonth(11);
+                }
+                
+                cal.generateHTML();
+                $('#calendar').append(cal.getHTML());
+
+            });
+            
+            $('#nextMonth').click(function(){
+                $('#calendar').html('');
+
+                if(cal.getMonth()+1<12){
+                  cal.setMonth(cal.getMonth()+1);
+                }
+                else{
+                  cal.setYear(cal.getYear()+1);
+                  cal.setMonth(0);
+                }
+
+                cal.generateHTML();
+                $('#calendar').append(cal.getHTML());
+            });
+            
+
+        });
+  		</script>
+	</body>
+
+</html>
